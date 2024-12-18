@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打磚塊遊戲</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            display: block;
+            background-color: #87CEEB;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="score">分數: 0</div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let score = 0;
+        let paddleWidth = 150;
+        let paddleX = (canvas.width - paddleWidth) / 2;
+        let ballRadius = 10;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height - 30;
+        let ballDX = 4;
+        let ballDY = -4;
+
+        const paddle = { x: paddleX, width: paddleWidth, height: 20, color: '#ff6347' };
+
+        let rightPressed = false;
+        let leftPressed = false;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowRight') {
+                rightPressed = true;
+            } else if (e.code === 'ArrowLeft') {
+                leftPressed = true;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowRight') {
+                rightPressed = false;
+            } else if (e.code === 'ArrowLeft') {
+                leftPressed = false;
+            }
+        });
+
+        function update() {
+            if (rightPressed && paddle.x + paddle.width < canvas.width) {
+                paddle.x += 7;
+            } else if (leftPressed && paddle.x > 0) {
+                paddle.x -= 7;
+            }
+
+            ballX += ballDX;
+            ballY += ballDY;
+
+            // Ball collision with walls
+            if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
+                ballDX = -ballDX;
+            }
+            if (ballY - ballRadius < 0) {
+                ballDY = -ballDY;
+            } else if (ballY + ballRadius > canvas.height) {
+                if (ballX > paddle.x && ballX < paddle.x + paddle.width) {
+                    ballDY = -ballDY;
+                    score++;
+                } else {
+                    alert("遊戲結束！你的分數是 " + score);
+                    score = 0;
+                    ballX = canvas.width / 2;
+                    ballY = canvas.height - 30;
+                    ballDX = 4;
+                    ballDY = -4;
+                }
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = paddle.color;
+            ctx.fillRect(paddle.x, canvas.height - paddle.height, paddle.width, paddle.height);
+
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            ctx.closePath();
+
+            document.getElementById('score').innerText = '分數: ' + score;
+        }
+
+        setInterval(update, 1000 / 60);
+    </script>
+</body>
+</html>
