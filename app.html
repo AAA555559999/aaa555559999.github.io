@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待辦事項管理</title>
+    <style>
+        /* 通用設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f8ff, #e0e0e0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* 主要容器樣式 */
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* 標題 */
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* 輸入框樣式 */
+        .task-input {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        #task-input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #add-task-btn {
+            width: 15%;
+            padding: 10px;
+            background-color: #5c6bc0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #add-task-btn:hover {
+            background-color: #3f51b5;
+        }
+
+        /* 任務列表樣式 */
+        .task-list {
+            margin-top: 20px;
+            list-style-type: none;
+        }
+
+        .task-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card.complete {
+            background-color: #e0f7fa;
+            text-decoration: line-through;
+        }
+
+        .task-text {
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .complete-btn {
+            background: #4caf50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .complete-btn:hover {
+            background: #388e3c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <h1>待辦事項管理</h1>
+        <div class="task-input">
+            <input type="text" id="task-input" placeholder="新增任務...">
+            <button id="add-task-btn">新增</button>
+        </div>
+
+        <div class="task-list" id="task-list">
+            <!-- 任務將顯示在這裡 -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const taskInput = document.getElementById('task-input');
+            const addTaskBtn = document.getElementById('add-task-btn');
+            const taskList = document.getElementById('task-list');
+
+            // 新增任務
+            addTaskBtn.addEventListener('click', function () {
+                const taskText = taskInput.value.trim();
+
+                if (taskText !== '') {
+                    const taskItem = document.createElement('div');
+                    taskItem.classList.add('task-card');
+
+                    // 任務文本
+                    const taskTextElement = document.createElement('span');
+                    taskTextElement.classList.add('task-text');
+                    taskTextElement.textContent = taskText;
+
+                    // 完成按鈕
+                    const completeBtn = document.createElement('button');
+                    completeBtn.classList.add('complete-btn');
+                    completeBtn.textContent = '完成';
+                    completeBtn.addEventListener('click', function () {
+                        taskItem.classList.toggle('complete');
+                    });
+
+                    // 刪除按鈕
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.addEventListener('click', function () {
+                        taskList.removeChild(taskItem);
+                    });
+
+                    taskItem.appendChild(taskTextElement);
+                    taskItem.appendChild(completeBtn);
+                    taskItem.appendChild(deleteBtn);
+
+                    taskList.appendChild(taskItem);
+                    taskInput.value = '';  // 清空輸入框
+                }
+            });
+
+            // 防止按下 Enter 鍵時頁面重新載入
+            taskInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    addTaskBtn.click();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
