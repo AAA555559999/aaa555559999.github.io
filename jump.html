@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳躍小人遊戲</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            display: block;
+            background-color: #87CEEB;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="score">分數: 0</div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let score = 0;
+        let isJumping = false;
+        let jumpHeight = 0;
+        let playerY = canvas.height - 100;
+
+        const player = { x: 100, y: playerY, width: 50, height: 50, color: '#ff6347' };
+        const obstacles = [];
+        const gravity = 0.8;
+        const jumpStrength = 15;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !isJumping) {
+                isJumping = true;
+                jumpHeight = jumpStrength;
+            }
+        });
+
+        function update() {
+            // Update player jump
+            if (isJumping) {
+                player.y -= jumpHeight;
+                jumpHeight -= gravity;
+                if (player.y >= playerY) {
+                    player.y = playerY;
+                    isJumping = false;
+                }
+            }
+
+            // Move obstacles
+            for (let i = 0; i < obstacles.length; i++) {
+                obstacles[i].x -= 5;
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                    score++;
+                    i--;
+                }
+            }
+
+            // Check for collision
+            for (let i = 0; i < obstacles.length; i++) {
+                if (player.x < obstacles[i].x + obstacles[i].width &&
+                    player.x + player.width > obstacles[i].x &&
+                    player.y < obstacles[i].y + obstacles[i].height &&
+                    player.y + player.height > obstacles[i].y) {
+                    alert("遊戲結束！你的分數是 " + score);
+                    score = 0;
+                    obstacles.length = 0;
+                }
+            }
+
+            // Draw everything
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            obstacles.forEach(obstacle => {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+
+            // Update score
+            document.getElementById('score').innerText = '分數: ' + score;
+        }
+
+        function spawnObstacle() {
+            const obstacleHeight = Math.random() * (canvas.height / 3) + 50;
+            obstacles.push({ x: canvas.width, y: canvas.height - obstacleHeight, width: 30, height: obstacleHeight });
+        }
+
+        setInterval(spawnObstacle, 2000);
+        setInterval(update, 1000 / 60);  // 60 FPS
+    </script>
+</body>
+</html>
